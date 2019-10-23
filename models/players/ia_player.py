@@ -25,8 +25,9 @@ class IA:
         curr_move = None
         curr_score = -self.INFINITY
         for next_move in board.valid_moves(self.color):
-            board.play(next_move, self.color)
-            _, next_score = self.__recursive_min(board, depth + 1)
+            next_board = board.get_clone()
+            next_board.play(next_move, self.color)
+            _, next_score = self.__recursive_min(next_board, depth + 1)
             if next_score > curr_score:
                 curr_score = next_score
                 curr_move = next_move
@@ -35,13 +36,14 @@ class IA:
 
     def __recursive_min(self, board, depth):
         if depth >= self.MAX_DEPTH:
-            return board, self.__h(board)
+            return None, self.__h(board)
 
         curr_move = None
         curr_score = self.INFINITY
         for next_move in board.valid_moves(self.opp_color):
-            board.play(next_move, self.opp_color)
-            _, next_score = self.__recursive_max(board, depth + 1)
+            next_board = board.get_clone()
+            next_board.play(next_move, self.opp_color)
+            _, next_score = self.__recursive_max(next_board, depth + 1)
             if next_score < curr_score:
                 curr_score = next_score
                 curr_move = next_move
@@ -49,4 +51,8 @@ class IA:
         return curr_move, curr_score
 
     def __h(self, board):
-        return 0
+        w, b = board.score()
+        if self.color == '@':
+            return b - w
+        else:
+            return w - b
