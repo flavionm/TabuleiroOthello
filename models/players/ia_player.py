@@ -67,8 +67,23 @@ class IA:
         return curr_move, curr_score
 
     def __h(self, board):
-        w, b = board.score()
-        if self.color == '@':
-            return b - w
+        return (25 * self.__coin_parity(board)
+                + 25 * self.__stability(board)
+                + 5 * self.__mobility(board)
+                + 30 * self.__corners(board))
+
+    def __coin_parity(self, board):
+        if self.color == 'o':
+            score, opp_score = board.score()
         else:
-            return w - b
+            opp_score, score = board.score()
+        return 100 * (score - opp_score) / (score + opp_score)
+
+    def __stability(self, board):
+        return 0
+
+    def __mobility(self, board):
+        return 0
+
+    def __corners(self, board):
+        return 0
