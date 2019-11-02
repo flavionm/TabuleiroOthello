@@ -3,7 +3,7 @@ class IA:
     MIN_DEPTH = 3
 
     MAX_TIME = 3
-    EST_BRANCHING = 5
+    EST_BRANCHING = 6
 
     import time
     time = time.time
@@ -113,4 +113,93 @@ class IA:
         return 0
 
     def __corners(self, board):
-        return 0
+        my_occupancy, opp_ocupancy = self.__corner_occupancy(board)
+        my_closeness, opp_closeness = self.__corner_closeness(board)
+
+        my_corners = 2 * my_occupancy - my_closeness
+        opp_corners = 2 * opp_ocupancy - opp_closeness
+
+        if my_corners + opp_corners == 0:
+            return 0
+        else:
+            return 100 * (my_corners - opp_corners) / (my_corners + opp_corners)
+
+    def __corner_occupancy(self, board):
+        my_points = opp_points = 0
+        if board.board[1][1] == self.color:
+            my_points += 1
+        elif board.board[1][1] == self.opp_color:
+            opp_points += 1
+        if board.board[1][8] == self.color:
+            my_points += 1
+        elif board.board[1][8] == self.opp_color:
+            opp_points += 1
+        if board.board[8][0] == self.color:
+            my_points += 1
+        elif board.board[8][0] == self.opp_color:
+            opp_points += 1
+        if board.board[8][8] == self.color:
+            my_points += 1
+        elif board.board[8][8] == self.opp_color:
+            opp_points += 1
+        return my_points, opp_points
+
+    def __corner_closeness(self, board):
+        my_points = opp_points = 0
+        if board.board[1][1] == '.':
+            if board.board[1][2] == self.color:
+                my_points += 1
+            elif board.board[1][2] == self.opp_color:
+                opp_points += 1
+            if board.board[2][2] == self.color:
+                my_points += 1
+            elif board.board[2][2] == self.opp_color:
+                opp_points += 1
+            if board.board[2][1] == self.color:
+                my_points += 1
+            elif board.board[2][1] == self.opp_color:
+                opp_points += 1
+
+        if board.board[1][8] == '.':
+            if board.board[1][7] == self.color:
+                my_points += 1
+            elif board.board[1][7] == self.opp_color:
+                opp_points += 1
+            if board.board[2][7] == self.color:
+                my_points += 1
+            elif board.board[2][7] == self.opp_color:
+                opp_points += 1
+            if board.board[2][8] == self.color:
+                my_points += 1
+            elif board.board[2][8] == self.opp_color:
+                opp_points += 1
+
+        if board.board[8][1] == '.':
+            if board.board[8][2] == self.color:
+                my_points += 1
+            elif board.board[8][2] == self.opp_color:
+                opp_points += 1
+            if board.board[7][2] == self.color:
+                my_points += 1
+            elif board.board[7][2] == self.opp_color:
+                opp_points += 1
+            if board.board[7][1] == self.color:
+                my_points += 1
+            elif board.board[7][1] == self.opp_color:
+                opp_points += 1
+
+        if board.board[8][8] == '.':
+            if board.board[7][8] == self.color:
+                my_points += 1
+            elif board.board[7][8] == self.opp_color:
+                opp_points += 1
+            if board.board[7][7] == self.color:
+                my_points += 1
+            elif board.board[7][7] == self.opp_color:
+                opp_points += 1
+            if board.board[8][7] == self.color:
+                my_points += 1
+            elif board.board[8][7] == self.opp_color:
+                opp_points += 1
+
+        return my_points, opp_points
