@@ -20,7 +20,7 @@ class IA:
         depth = self.MIN_DEPTH
         last_time = 0
         total_time = 0
-        while self.EST_BRANCHING * last_time + total_time < self.MAX_TIME:
+        while self.EST_BRANCHING * last_time + last_time + total_time < self.MAX_TIME:
             start = self.time()
             move = self.__minimax(board, depth)
             last_time = self.time() - start
@@ -29,57 +29,67 @@ class IA:
         return move
 
     def __minimax(self, board, depth):
-        move, _ = self.__recursive_max(board, self.INFINITY, 0, depth)
+        move, _ = self.__recursive_max(board, self.INFINITY, None, 0, depth)
 
         return move
 
-    def __recursive_max(self, board, max_score, depth, max_depth):
+    def __recursive_max(self, board, max_score, parent_killer_move, depth, max_depth):
         if depth >= max_depth:
             return None, self.__h(board)
 
         curr_move = None
         curr_score = -self.INFINITY
+        child_killer_move = None
 
         valid_moves = board.valid_moves(self.color)
         if not valid_moves:
             _, curr_score = self.__recursive_min(
-                board, curr_score, depth + 1, max_depth)
+                board, curr_score, child_killer_move, depth + 1, max_depth)
         else:
+            if parent_killer_move is not None:
+                valid_moves = [parent_killer_move] + valid_moves
             for next_move in valid_moves:
                 next_board = board.get_clone()
                 next_board.play(next_move, self.color)
-                _, next_score = self.__recursive_min(
-                    next_board, curr_score, depth + 1, max_depth)
+                killer_move, next_score = self.__recursive_min(
+                    next_board, curr_score, child_killer_move, depth + 1, max_depth)
                 if next_score > curr_score:
                     curr_score = next_score
                     curr_move = next_move
                     if curr_score >= max_score:
                         break
+                else:
+                    child_killer_move = killer_move
 
         return curr_move, curr_score
 
-    def __recursive_min(self, board, min_score, depth, max_depth):
+    def __recursive_min(self, board, min_score, parent_killer_move, depth, max_depth):
         if depth >= max_depth:
             return None, self.__h(board)
 
         curr_move = None
         curr_score = self.INFINITY
+        child_killer_move = None
 
         valid_moves = board.valid_moves(self.opp_color)
         if not valid_moves:
             _, curr_score = self.__recursive_min(
-                board, curr_score, depth + 1, max_depth)
+                board, curr_score, child_killer_move, depth + 1, max_depth)
         else:
+            if parent_killer_move is not None:
+                valid_moves = [parent_killer_move] + valid_moves
             for next_move in valid_moves:
                 next_board = board.get_clone()
                 next_board.play(next_move, self.opp_color)
-                _, next_score = self.__recursive_max(
-                    next_board, curr_score, depth + 1, max_depth)
+                killer_move, next_score = self.__recursive_max(
+                    next_board, curr_score, child_killer_move, depth + 1, max_depth)
                 if next_score < curr_score:
                     curr_score = next_score
                     curr_move = next_move
                     if curr_score <= min_score:
                         break
+                else:
+                    child_killer_move = killer_move
 
         return curr_move, curr_score
 
